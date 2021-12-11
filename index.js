@@ -38,34 +38,7 @@ morgan.token("body", function (req, res) {
   return [JSON.stringify(req.body)];
 });
 
-// POST
-app.post("/api/persons", async (request, response) => {
-  const body = request.body;
-  if (!body.number || !body.name) {
-    return response.status(400).json({ error: "name or number missing" });
-  }
-  try {
-    const inExistence = await personas.find(
-      (person) => person.name === body.name
-    );
-    if (inExistence != null) {
-      return response
-        .status(400)
-        .json({ error: `Person with name ${body.name} already exists` });
-    }
-    const toPush = {
-      id: Number((Math.random() * ((2 ^ 52000) - 1) + 1).toFixed(0)),
-      ...body,
-    };
-    personas.push(toPush);
-    return response.status(201).json(toPush);
-  } catch (error) {
-    console.log(error.message);
-    return response.status(500).json({ error: error.message });
-  }
-});
-
-// GET /api/****/:id
+// GET /api/persons
 app.get("/api/persons", async (request, response) => {
   try {
     const persons = await personas;
@@ -88,7 +61,7 @@ app.get("/info", async (request, response) => {
   }
 });
 
-// GET por id
+// GET /api/persons/:id
 app.get("/api/persons/:id", async (request, response) => {
   try {
     const id = Number(request.params.id);
@@ -120,6 +93,34 @@ app.delete("/api/persons/:id", (request, response) => {
 
   return response.status(204).end();
 });
+
+// POST
+app.post("/api/persons", async (request, response) => {
+  const body = request.body;
+  if (!body.number || !body.name) {
+    return response.status(400).json({ error: "name or number missing" });
+  }
+  try {
+    const inExistence = await personas.find(
+      (person) => person.name === body.name
+    );
+    if (inExistence != null) {
+      return response
+        .status(400)
+        .json({ error: `Person with name ${body.name} already exists` });
+    }
+    const toPush = {
+      id: Number((Math.random() * ((2 ^ 52000) - 1) + 1).toFixed(0)),
+      ...body,
+    };
+    personas.push(toPush);
+    return response.status(201).json(toPush);
+  } catch (error) {
+    console.log(error.message);
+    return response.status(500).json({ error: error.message });
+  }
+});
+
 
 const PORT = 3001;
 
